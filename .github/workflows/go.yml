@@ -25,4 +25,8 @@ jobs:
         # 运行指令：输出环境变量
         run: |
           echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+          ls -l
+          echo "a" > a.txt
+          ls -l
       - run: echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+      - run: ls -l
