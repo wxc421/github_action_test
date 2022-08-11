@@ -2,6 +2,8 @@
 name: Greeting from Mona
 
 # 定义 Workflow 的触发器
+# git tag v0.1.2
+# git push origin --tags
 on:
   push:
     tags:
@@ -20,16 +22,22 @@ jobs:
       - run: |
           printenv
           echo ${{ github.ref }}
-      # 定义 step 的名称
-      - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: 读取描述文件
+        id: description
+        uses: juliangruber/read-file-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
-          body: TODO New Release.
-          draft: false
-          prerelease: false
-          files: |
-            ${{ secrets.ReleaseZipName }}.zip
-            LICENSE
+          path: ./description.md
+      - name: 创建GitHub Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }} # 此次发布标签的名字
+          release_name: ${{ steps.get_version.outputs.VERSION }} # 发布的名称
+          body: ${{steps.description.outputs.content}} # 发布内容的文本描述
+          draft: false # 是否创建为草稿 true:创建为草稿  ,false 直接发布默认false.
+          prerelease: false # 是否设置为预发布, ture或false, 默认为false
