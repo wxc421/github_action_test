@@ -2,6 +2,7 @@
 name: Greeting from Mona
 
 # 定义 Workflow 的触发器
+# git push
 # git tag v0.1.2
 # git push origin --tags
 on:
@@ -22,6 +23,7 @@ jobs:
       - run: |
           printenv
           echo ${{ github.ref }}
+          ls -al
       - name: Get version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
