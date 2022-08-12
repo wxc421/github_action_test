@@ -10,8 +10,6 @@ on:
     branches: [ master ]
     tags:
       - 'v*.*.*'
-  pull_request:
-    branches: [ master ]
 
 # 定义 Workflow 的 job
 jobs:
@@ -41,14 +39,15 @@ jobs:
         with:
           path: ./description.md
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: my-artifact
-          path: ./distributed.7z
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: my-artifact
+#          path: ./distributed.7z
 
       - name: 创建GitHub Release
         id: create_release
-        uses: actions/create-release@latest
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
@@ -57,3 +56,5 @@ jobs:
           body: ${{steps.description.outputs.content}} # 发布内容的文本描述
           draft: false # 是否创建为草稿 true:创建为草稿  ,false 直接发布默认false.
           prerelease: false # 是否设置为预发布, ture或false, 默认为false
+          files: |
+            ./distributed.7z
